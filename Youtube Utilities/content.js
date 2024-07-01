@@ -14,8 +14,15 @@ function toggleSkipBehaviour (condition) {
 function skip(e) {
     let video = document.querySelector(".ad-showing .html5-main-video");
     if (video && e.key === 'q') {
-        video.currentTime = video.duration;
-        document.querySelectorAll(".ytp-skip-ad-button, .ytp-ad-skip-button-modern").forEach(e => e.click());
+
+        const skipBtnList = document.querySelectorAll(".ytp-skip-ad-button, .ytp-ad-skip-button-modern");
+
+        if(skipBtnList.length)
+
+            skipBtnList.forEach(element => element.click());
+            
+        else video.currentTime = video.duration;
+        
     }
 }
 
