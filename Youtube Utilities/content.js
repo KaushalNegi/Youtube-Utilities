@@ -12,22 +12,29 @@ function toggleSkipBehaviour (condition) {
 }
 
 function skip(e) {
+
     let video = document.querySelector(".ad-showing .html5-main-video");
+
     if (video && e.key === 'q') {
-
+        
         const skipBtnList = document.querySelectorAll(".ytp-skip-ad-button, .ytp-ad-skip-button-modern");
-
+        
         if(skipBtnList.length)
 
             skipBtnList.forEach(element => element.click());
             
-        else video.currentTime = video.duration;
-        
+        if(video){
+            try{
+                video.currentTime = video.duration;
+            }
+            catch(e){}
+        }
+
     }
 }
 
 function toggleDislikeBehaviour (condition) {
-   
+
     prevLink = window.location.href;
     
     if(condition){
@@ -99,6 +106,10 @@ async function handleNavigate() {
                 }
             }, 0);
         }
+    }
+    videoId = window.location.href.match("(?<=shorts/)[^/?]+");
+    if(videoId){
+        let URL = `https://returnyoutubedislikeapi.com/votes?videoId=${videoId[0]}`;
     }
 }
 
