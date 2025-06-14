@@ -52,6 +52,9 @@ function toggleDislikeBehaviour(condition) {
         if (dislikeBtn)
             dislikeBtn.style.gap = "0px";
 
+        if(document.querySelector("#reel-video-renderer #dislike-button span.yt-core-attributed-string"))
+            document.querySelector("#reel-video-renderer #dislike-button span.yt-core-attributed-string").innerText = "Dislike";
+        
         clearInterval(handleNavigateIntervalId);
         clearInterval(handleClickIntervalId);
 
@@ -113,6 +116,14 @@ async function handleNavigate() {
     videoId = window.location.href.match("(?<=shorts/)[^/?]+");
     if (videoId) {
         let URL = `https://returnyoutubedislikeapi.com/votes?videoId=${videoId[0]}`;
+        dislikeCount = (await (await fetch(URL)).json()).dislikes;
+        handleNavigateIntervalId = setInterval(()=>{
+            if(document.querySelector("#reel-video-renderer #dislike-button button.yt-spec-button-shape-next")){
+                dislikeBtn = document.querySelector("#reel-video-renderer #dislike-button button.yt-spec-button-shape-next");
+                clearInterval(handleNavigateIntervalId);
+                handleShortsDislike();
+            }
+        }, 0);
     }
 }
 
@@ -180,6 +191,28 @@ function updateCount() {
     }, 0);
 
     return updateCount;
+}
+
+function handleShortsDislike(){
+    handleClickIntervalId = setInterval(() => {
+        if(document.querySelector("#reel-video-renderer #like-button button.yt-spec-button-shape-next")){
+            clearInterval(handleClickIntervalId);
+            document.querySelector("#reel-video-renderer #dislike-button button.yt-spec-button-shape-next")
+                .addEventListener("click", updateShortCount());
+            document.querySelector("#reel-video-renderer #like-button button.yt-spec-button-shape-next")
+                .addEventListener('click', updateShortCount);
+        }
+    });
+}
+
+function updateShortCount(){
+    const updateShortCountIntervalId = setInterval(() => {
+        document.querySelector("#reel-video-renderer #dislike-button span.yt-core-attributed-string").innerText = formatDislikeCount(dislikeCount + (dislikeBtn.getAttribute("aria-pressed") == 'true' ? 1 : 0)); 
+    }, 0);
+    setTimeout(() => {
+        clearInterval(updateShortCountIntervalId);
+    }, 5000);
+    return updateShortCount;
 }
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
