@@ -4,6 +4,7 @@ let dislikeBtn;
 let prevLink;
 let handleNavigateIntervalId;
 let handleClickIntervalId;
+let handleUpdateShortCountIntervalId;
 
 chrome.storage.local.set({ adSkipperActive: false, showDislikesActive: false });
 
@@ -57,7 +58,7 @@ function toggleDislikeBehaviour(condition) {
         
         clearInterval(handleNavigateIntervalId);
         clearInterval(handleClickIntervalId);
-
+        clearInterval(handleUpdateShortCountIntervalId);
         navigation.removeEventListener("navigate", navigationEventHandlerFunctionMain);
         document.removeEventListener("click", updateCount);
     }
@@ -65,6 +66,10 @@ function toggleDislikeBehaviour(condition) {
 }
 
 function navigationEventHandlerFunctionMain() {
+
+    clearInterval(handleNavigateIntervalId);
+    clearInterval(handleClickIntervalId);
+    clearInterval(handleUpdateShortCountIntervalId);
 
     let wasMiniplayerActive = document.querySelector("ytd-miniplayer").hasAttribute("active");
     // document.querySelector("ytd-miniplayer").active not working and giving undefined everytime even though working fine in browser.
@@ -206,11 +211,12 @@ function handleShortsDislike(){
 }
 
 function updateShortCount(){
-    const updateShortCountIntervalId = setInterval(() => {
-        document.querySelector("#reel-video-renderer #dislike-button span.yt-core-attributed-string").innerText = formatDislikeCount(dislikeCount + (dislikeBtn.getAttribute("aria-pressed") == 'true' ? 1 : 0)); 
+    handleUpdateShortCountIntervalId = setInterval(() => {
+        if(document.querySelector("#reel-video-renderer #dislike-button span.yt-core-attributed-string"))
+            document.querySelector("#reel-video-renderer #dislike-button span.yt-core-attributed-string").innerText = formatDislikeCount(dislikeCount + (dislikeBtn.getAttribute("aria-pressed") == 'true' ? 1 : 0)); 
     }, 0);
     setTimeout(() => {
-        clearInterval(updateShortCountIntervalId);
+        clearInterval(handleUpdateShortCountIntervalId);
     }, 5000);
     return updateShortCount;
 }
